@@ -15,7 +15,7 @@ app.use(express.static('public'))
 
 // http://expressjs.com/en/starter/basic-routing.html
 app.get('/', function (req, res) {
-  res.sendFile(__dirname + '/views/index.html')
+  res.sendFile(__dirname + '/index.html')
 })
 
 // your first API endpoint...
@@ -33,50 +33,25 @@ app.get('/api/', function (req, res) {
 })
 
 app.get('/api/:date', function (req, res) {
-  const unixTimestamp = parseInt(req.params.date, 10)
-  if (!isNaN(unixTimestamp) && unixTimestamp >= 0) {
-    // Check if it's in a valid range for Unix timestamps (e.g., not too large)
-    const date = new Date(req.params.date * 1000)
+  const paraDate = req.params.date
 
-    const options = {
-      weekday: 'short', // Short weekday name (e.g., "Fri")
-      day: '2-digit', // Day of the month with leading zeros (e.g., "25")
-      month: 'short', // Short month name (e.g., "Dec")
-      year: 'numeric', // Full year (e.g., "2015")
-      hour: '2-digit', // Hour with leading zeros (e.g., "00")
-      minute: '2-digit', // Minute with leading zeros (e.g., "00")
-      second: '2-digit', // Second with leading zeros (e.g., "00")
-      timeZoneName: 'short', // Short time zone name (e.g., "GMT")
-    }
+  const regex = /-/
 
-    const formattedDate = date.toLocaleString('en-US', options)
-    const unix = date.getTime()
+  if (regex.test(paraDate)) {
+    const date = new Date(req.params.date)
 
     res.json({
-      unix: unix,
-      utc: formattedDate,
+      unix: date.getTime(),
+      utc: date.toUTCString(),
+    })
+  } else {
+    const date = new Date(req.params.date * 1000)
+
+    res.json({
+      unix: date.getTime(),
+      utc: date.toUTCString(),
     })
   }
-  const date = new Date(req.params.date)
-
-  const options = {
-    weekday: 'short', // Short weekday name (e.g., "Fri")
-    day: '2-digit', // Day of the month with leading zeros (e.g., "25")
-    month: 'short', // Short month name (e.g., "Dec")
-    year: 'numeric', // Full year (e.g., "2015")
-    hour: '2-digit', // Hour with leading zeros (e.g., "00")
-    minute: '2-digit', // Minute with leading zeros (e.g., "00")
-    second: '2-digit', // Second with leading zeros (e.g., "00")
-    timeZoneName: 'short', // Short time zone name (e.g., "GMT")
-  }
-
-  const formattedDate = date.toLocaleString('en-US', options)
-  const unix = date.getTime()
-
-  res.json({
-    unix: unix,
-    utc: formattedDate,
-  })
 })
 
 // listen for requests :)
